@@ -1,43 +1,55 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"
 
 # Database configuration
 db_config = {
-    'host': 'db',
-    'user': 'root',
-    'password': 'password',
-    'database': 'studentsdb'
+    "host": "localhost",
+    "user": "flaskuser",
+    "password": "Flask@1234",
+    "database": "student_db"
 }
 
-# Home page: Registration form
-@app.route('/', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        phone = request.form['phone']
-        course = request.form['course']
-        address = request.form['address']
-        contact = request.form['contact']
+@app.route('/')
+def index():
+    return render_template('index.html')
 
+@app.route('/register', methods=['POST'])
+def register():
+    name    = request.form['name']
+    email   = request.form['email']
+    phone   = request.form['phone']
+    course  = request.form['course']
+    address = request.form['address']
+    contact = request.form.get('contact', '')
+
+    try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
-
-        query = '''
-        INSERT INTO students (name, email, phone, course, address, contact)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        '''
-        values = (name, email, phone, course, address, contact)
-
-        cursor.execute(query, values)
+        cursor.execute(
+            "INSERT INTO students (name, email, phone, course, address, contact) VALUES (%s,%s,%s,%s,%s,%s)",
+            (name, email, phone, course, address, contact)
+        )
         conn.commit()
         cursor.close()
         conn.close()
+        flash("Student registered successfully!", "success")
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
 
-        return 'Student Registered Successfully!'
-    return render_template('register.html')
+    return redirect(url_for('index'))
+
+@app.route('/students')
+def students():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('students.html', students=data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)

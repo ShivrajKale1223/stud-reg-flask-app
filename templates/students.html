@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Students</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a { display: inline-block; margin-top: 15px; color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <h2>Registered Students</h2>
+    <table>
+        <tr>
+            <th>ID</th><th>Name</th><th>Email</th>
+            <th>Phone</th><th>Course</th><th>Address</th><th>Contact</th>
+        </tr>
+        {% for s in students %}
+        <tr>
+            <td>{{ s[0] }}</td>
+            <td>{{ s[1] }}</td>
+            <td>{{ s[2] }}</td>
+            <td>{{ s[3] }}</td>
+            <td>{{ s[4] }}</td>
+            <td>{{ s[5] }}</td>
+            <td>{{ s[6] if s[6] else '-' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/">← Back to Registration Form</a>
+</body>
+</html>
