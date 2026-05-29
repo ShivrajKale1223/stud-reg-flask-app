@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_SERVER = '34.201.32.53'   // ← Change this
+        APP_DIR = '/home/ubuntu/stud-reg-flask-app'
+        KEY = '/var/lib/jenkins/.ssh/mykey.pem'  // ← Key path we just set
+    }
+
+    stages {
+        stage('Pull Code') {
+            steps {
+                sh """
+                    ssh -i ${KEY} -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} '
+                        cd ${APP_DIR} &&
+                        git pull origin main
+                    '
+                """
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh """
+                    ssh -i ${KEY} -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} '
+                        cd ${APP_DIR} &&
+                        source venv/bin/activate &&
+                        pip install -r requirements.txt
+                    '
+                """
+            }
+        }
+
+        stage('Restart Flask App') {
+            steps {
+                sh """
+                    ssh -i ${KEY} -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} '
+                        sudo systemctl restart flaskapp
+                    '
+                """
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh """
+                    ssh -i ${KEY} -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} '
+                        sudo systemctl status flaskapp | grep "active (running)"
+                    '
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Deployment Successful!' }
+        failure { echo '❌ Deployment Failed!' }
+    }
+}
