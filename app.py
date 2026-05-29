@@ -51,6 +51,5 @@ def students():
     conn.close()
     return render_template('students.html', students=data)
 
-
 if __name__ == '__main__':
     app.run(debug=True)
