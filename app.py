@@ -51,6 +51,6 @@ def students():
     conn.close()
     return render_template('students.html', students=data)
 
-# Flask Student Registration App - Version 2.0
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
