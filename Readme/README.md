@@ -334,4 +334,4 @@ pipeline {
 
 ---
 
-*Project 3 — Flask-Based Student Registration Web Application deployed using Jenkins*
+*Project — Flask-Based Student Registration Web Application deployed using Jenkins*
